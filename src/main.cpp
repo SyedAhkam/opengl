@@ -10,6 +10,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height); // set viewport size to new dimensions
 }
 
+// Process inputs
+void processInput(GLFWwindow* window) {
+    // Check if escape key is pressed
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, 1); // if yes, set 'windowShouldClose' value to 1 ie. true
+    }
+}
+
+// Perform all the rendering here
+void doRendering(GLFWwindow* window) {
+    // Clear the screen
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // sets the ClearColor state
+    glClear(GL_COLOR_BUFFER_BIT); // clears the entire buffer
+}
+
 int main() {
     // Init GLFW
     glfwInit();
@@ -45,6 +60,11 @@ int main() {
 
     // Main window/render loop
     while (!glfwWindowShouldClose(window)) {
+        processInput(window); // process inputs if any
+
+        // Do all the rendering in this function
+        doRendering(window);
+
         glfwSwapBuffers(window); // swaps the back buffer to the front (double buffering)
         glfwPollEvents(); // start polling events
     }
