@@ -49,10 +49,11 @@ void loadShaders() {
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // binds the vertex shader source to the shader object
     glCompileShader(vertexShader);
 
-    // Check if vertex shader compilation was successful
+    // Store logs and success indicator here
     int success;
     char infoLog[512];
 
+    // Check if vertex shader compilation was successful
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success); // query the shader compile status
     
     // If unsuccessful,
@@ -80,7 +81,33 @@ void loadShaders() {
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    // TODO
+    // Create a shader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    
+    // Attach shaders to program
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+
+    // Link shader program
+    glLinkProgram(shaderProgram);
+
+    // Check if linking the program was successful
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+
+    // If unsuccessful,
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+
+        std::cout << "ERROR:SHADER_PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
+    }
+    
+    // Use/Activate the shader program
+    glUseProgram(shaderProgram);
+
+    // Shader objects are no longer needed
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 }
 
 void loadVertices() {
