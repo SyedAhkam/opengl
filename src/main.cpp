@@ -5,9 +5,13 @@
 
 #include <main.h>
 
+// Constants
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
 float triangle_vertices[] = {
     -0.5f, -0.5f, 0.0f,
-    0.5f, 0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
     0.0f, 0.5f, 0.0f
 };
 
@@ -111,16 +115,38 @@ void loadShaders() {
 }
 
 void loadVertices() {
+    // NOTE: Always generate VAO before any VBO's
+
+    // Create a vertex array object
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    
     // Generate a vertex buffer object
     unsigned int VBO;
     glGenBuffers(1, &VBO);
+ 
+    // Bind the vertex array object for use
+    glBindVertexArray(VAO);
 
     // Bind the vertex buffer object with target as an array buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     // Set 'BufferData' as our triangle_vertices
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
-}
+
+    // Hint/point opengl how to interpret our vertices array
+    glVertexAttribPointer(
+        0,                  // Index of the vertex attribute
+        3,                  // Size of the vertex attribute
+        GL_FLOAT,           // Type of the data
+        GL_FALSE,           // Should the data be normalized?
+        3 * sizeof(float),  // This is the stride ie. the byte offset between vertex attributes
+        (void*)0            // Offset of the first vertex attribute  
+    );
+
+    // Enable VertexAttribArray
+    glEnableVertexAttribArray(0);
+   }
 
 // Perform all the rendering here
 void doRendering(GLFWwindow* window) {
@@ -128,6 +154,8 @@ void doRendering(GLFWwindow* window) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // sets the ClearColor state
     glClear(GL_COLOR_BUFFER_BIT); // clears the entire buffer
 
+    // Draw the triangle !!
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 int main() {
@@ -140,7 +168,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // make sure to use the core profile
 
     // Create a window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Hello Opengl", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hello Opengl", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create window" << std::endl;
         
@@ -158,7 +186,7 @@ int main() {
     }
 
     // Set viewport size (yes, this is different than the window size)
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
     // Bind the window resize callback
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
