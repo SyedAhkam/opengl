@@ -41,16 +41,6 @@ void processInput(GLFWwindow* window) {
 }
 
 void loadShaders() {
-    // Generate a vertex buffer object
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-
-    // Bind the virtex buffer object with target as an array buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // Set 'BufferData' as our triangle_vertices
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
-
     // Create and compile the vertex shader
     unsigned int vertexShader;
     
@@ -91,6 +81,18 @@ void loadShaders() {
     }
 
     // TODO
+}
+
+void loadVertices() {
+    // Generate a vertex buffer object
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Bind the vertex buffer object with target as an array buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Set 'BufferData' as our triangle_vertices
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
 }
 
 // Perform all the rendering here
@@ -136,6 +138,9 @@ int main() {
 
     // Load our shaders
     loadShaders();
+
+    // Load vertices
+    loadVertices();
 
     // Main window/render loop
     while (!glfwWindowShouldClose(window)) {

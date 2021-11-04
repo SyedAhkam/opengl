@@ -5,3 +5,5 @@ void processInput(GLFWwindow* window);
 void doRendering(GLFWwindow* window);
 
 void loadShaders();
+
+void loadVertices();
