@@ -1,9 +1,31 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
 #include <main.h>
 
-#include <iostream>
+float triangle_vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, 0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f
+};
+
+const char *vertexShaderSource = 
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+const char *fragmentShaderSource =
+    "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
 
 // A callback function that executes on every window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -18,11 +40,65 @@ void processInput(GLFWwindow* window) {
     }
 }
 
+void loadShaders() {
+    // Generate a vertex buffer object
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Bind the virtex buffer object with target as an array buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // Set 'BufferData' as our triangle_vertices
+    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
+
+    // Create and compile the vertex shader
+    unsigned int vertexShader;
+    
+    vertexShader = glCreateShader(GL_VERTEX_SHADER); // creates a vertex shader object
+
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // binds the vertex shader source to the shader object
+    glCompileShader(vertexShader);
+
+    // Check if vertex shader compilation was successful
+    int success;
+    char infoLog[512];
+
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success); // query the shader compile status
+    
+    // If unsuccessful,
+    if (!success) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog); // fetches the shader compile logs
+
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Create and compile the fragment shader
+    unsigned int fragmentShader;
+
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER); // creates a fragment shader object
+
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL); // binds the fragment shader source to the shader object
+    glCompileShader(fragmentShader);
+
+    // Check if fragment shader compilation was successful
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+
+    // If unsuccessful,
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog); // fetches the shader compile logs
+
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // TODO
+}
+
 // Perform all the rendering here
 void doRendering(GLFWwindow* window) {
     // Clear the screen
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // sets the ClearColor state
     glClear(GL_COLOR_BUFFER_BIT); // clears the entire buffer
+
 }
 
 int main() {
@@ -57,6 +133,9 @@ int main() {
 
     // Bind the window resize callback
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // Load our shaders
+    loadShaders();
 
     // Main window/render loop
     while (!glfwWindowShouldClose(window)) {
